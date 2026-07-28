@@ -1,6 +1,5 @@
 [Unit]
 Description=Universal uAsset spread tracker
-Documentation=https://github.com/%i/universal-spread-tracker
 After=network-online.target
 Wants=network-online.target
 
