@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+# Ці файли виконуються на Linux — CRLF зламає shebang і systemd
+*.sh        text eol=lf
+*.service   text eol=lf

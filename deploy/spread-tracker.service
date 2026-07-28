@@ -1,0 +1,41 @@
+[Unit]
+Description=Universal uAsset spread tracker
+Documentation=https://github.com/%i/universal-spread-tracker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tracker
+Group=tracker
+WorkingDirectory=/opt/spread-tracker
+
+# Секрети живуть тут, а не в цьому файлі. chmod 600, власник tracker.
+EnvironmentFile=/etc/spread-tracker.env
+
+ExecStart=/usr/bin/python3 -u /opt/spread-tracker/spread_tracker.py
+
+# Трекер не має падати назавжди через мережу — піднімати завжди
+Restart=always
+RestartSec=15
+
+# Журнал: systemd сам ловить stdout
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=spread-tracker
+
+# Пісочниця — процесу треба лише своя тека і мережа
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/spread-tracker
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryMax=256M
+
+[Install]
+WantedBy=multi-user.target

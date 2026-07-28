@@ -1,0 +1,20 @@
+# Секрети — токен бота живе тільки в оточенні, ніколи в репозиторії
+.env
+*.env
+!.env.example
+
+# Дані рантайму
+spread_log.csv
+tracker_settings.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Редактори
+.vscode/
+.idea/
+*.swp
+.DS_Store
