@@ -43,6 +43,7 @@ import os
 import signal
 import sys
 import time
+import traceback
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
@@ -552,6 +553,13 @@ def main():
                     time.sleep(300)
                     fails = 0
                 continue
+            except Exception:
+                # Монітор має жити далі. Що завгодно несподіване — у лог і поїхали:
+                # згаснути тихо посеред ночі гірше, ніж пропустити один тік.
+                print(f"{RED}{name}: несподівана помилка{OFF}\n"
+                      f"{traceback.format_exc()}", file=sys.stderr)
+                time.sleep(5)
+                continue
 
             t = rt["thr"][name]
             hit = abs(m["arb"]) >= t
@@ -587,8 +595,12 @@ def main():
                 time.sleep(min(3, max(0.2, left)))
                 continue
             started = time.time()
-            cursor = pump_commands(a, rt, picked, last, cursor,
-                                   wait=int(min(20, max(1, left))))
+            try:
+                cursor = pump_commands(a, rt, picked, last, cursor,
+                                       wait=int(min(20, max(1, left))))
+            except Exception:
+                print(f"{RED}опитування команд збійнуло{OFF}\n"
+                      f"{traceback.format_exc()}", file=sys.stderr)
             # якщо мережа впала, довгий пул повернеться миттєво — не крутити
             # цикл на повній швидкості
             if time.time() - started < 0.5:
