@@ -41,8 +41,17 @@ install -m 644 "$SRC/deploy/$SERVICE.service" "/etc/systemd/system/$SERVICE.serv
 systemctl daemon-reload
 systemctl enable "$SERVICE" >/dev/null
 
-# Перевіряємо, що код узагалі робочий, перш ніж пускати в бій
-sudo -u tracker python3 "$APP_DIR/test_tracker.py" >/dev/null && echo "тести пройдено"
+# Перевіряємо, що код узагалі робочий, перш ніж пускати в бій.
+# Вивід тестів ховаємо лише коли все добре — при збої він потрібен на екрані.
+echo "Python: $(python3 --version 2>&1)"
+if out=$(sudo -u tracker python3 "$APP_DIR/test_tracker.py" 2>&1); then
+  echo "Тести: $(printf '%s\n' "$out" | tail -1)"
+else
+  echo
+  echo "!!! Тести не пройшли — сервіс не запускаю."
+  printf '%s\n' "$out" | tail -25
+  exit 1
+fi
 
 if grep -q '^TG_BOT_TOKEN=.\+' "$ENV_FILE"; then
   systemctl restart "$SERVICE"
